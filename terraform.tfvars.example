@@ -1,0 +1,17 @@
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and customize as needed
+
+aws_region   = "us-east-1"
+project_name = "terraform-cicd"
+environment  = "dev"
+
+# S3 Backend Configuration (optional - used by setup script)
+terraform_state_bucket = "my-terraform-state-bucket-unique-name"
+terraform_state_key    = "iam-roles/terraform.tfstate"
+
+tags = {
+  ManagedBy   = "Terraform"
+  Environment = "dev"
+  Team        = "DevOps"
+  Project     = "Infrastructure"
+}
