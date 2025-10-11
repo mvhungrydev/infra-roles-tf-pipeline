@@ -13,29 +13,139 @@ This Terraform configuration creates AWS IAM roles and policies for CodeBuild an
 ## Resources Created
 
 ### IAM Roles
-
 - **CodeBuild Role**: Used by AWS CodeBuild projects
 - **CodePipeline Role**: Used by AWS CodePipeline
 
 ### IAM Policies
+- **CodeBuild Policies**: Base policy, EC2/VPC, Secrets Manager, Lambda, ACM, ECR, EventBridge, S3, IAM permissions
+- **CodePipeline Policies**: Base policy, CodeCommit, GitHub, SNS notifications
 
-- **CodeBuild Policies**:
+## Prerequisites
 
-  - Base policy (CloudWatch logs, reports)
-  - EC2/VPC full access
-  - Secrets Manager full access
-  - Lambda full access
-  - ACM full access
-  - ECR full access
-  - EventBridge full access
-  - S3 full access
-  - IAM permissions (for creating service roles)
+Before deploying, ensure you have:
 
-- **CodePipeline Policies**:
-  - Base policy (S3, CodeBuild, CloudFormation)
-  - CodeCommit access
-  - GitHub access (via CodeStar connections)
-  - SNS notifications
+### 1. **AWS CLI Configured**
+```bash
+# Install AWS CLI (if not already installed)
+# macOS: brew install awscli
+
+# Configure with your credentials
+aws configure
+# Enter your AWS Access Key ID, Secret Access Key, and region
+```
+
+### 2. **Required AWS Permissions**
+Your AWS user needs IAM permissions to create roles and policies. The easiest solution:
+
+**Go to AWS Console → IAM → Users → Find your user → Add permissions → Attach policies:**
+- Attach **`PowerUserAccess`** policy (recommended)
+
+**Or have an admin run:**
+```bash
+aws iam attach-user-policy \
+  --user-name YOUR_USERNAME \
+  --policy-arn arn:aws:iam::aws:policy/PowerUserAccess
+```
+
+### 3. **Verify Setup**
+```bash
+# Test your credentials and permissions
+aws sts get-caller-identity
+
+# Check permissions (optional)
+chmod +x check-permissions.sh
+./check-permissions.sh
+```
+
+## Deployment
+
+### Deploy the IAM Roles
+
+1. **Initialize Terraform:**
+```bash
+terraform init
+```
+
+2. **Review what will be created:**
+```bash
+terraform plan
+```
+
+3. **Deploy the resources:**
+```bash
+terraform apply
+```
+
+4. **Note the outputs** - you'll get the role ARNs that can be used in CodeBuild/CodePipeline projects.
+
+## Variables
+
+You can customize the deployment by creating a `terraform.tfvars` file:
+
+```hcl
+aws_region   = "us-west-2"
+project_name = "my-infrastructure" 
+environment  = "production"
+
+tags = {
+  ManagedBy   = "Terraform"
+  Environment = "production"
+  Team        = "DevOps"
+}
+```
+
+## Outputs
+
+After successful deployment, you'll get:
+- `codebuild_role_arn`: ARN of the CodeBuild role
+- `codebuild_role_name`: Name of the CodeBuild role  
+- `codepipeline_role_arn`: ARN of the CodePipeline role
+- `codepipeline_role_name`: Name of the CodePipeline role
+
+## Troubleshooting
+
+### Permission Denied Errors
+```bash
+# Error: "User is not authorized to perform: iam:CreateRole"
+```
+
+**Solution:** Add IAM permissions to your AWS user (see Prerequisites section above)
+
+### Common Issues
+- **AWS CLI not configured**: Run `aws configure`
+- **Wrong region**: Make sure your CLI region matches your desired deployment region
+- **Terraform not found**: Install Terraform locally if needed
+
+## Files Description
+
+- `main.tf`: Main configuration and provider setup
+- `variables.tf`: Input variables
+- `iam_roles.tf`: IAM role definitions
+- `codebuild_policies.tf`: CodeBuild IAM policies
+- `codepipeline_policies.tf`: CodePipeline IAM policies
+- `policy_attachments.tf`: Policy-to-role attachments
+- `outputs.tf`: Output values
+- `check-permissions.sh`: Script to verify AWS permissions
+- `.gitignore`: Git ignore file for Terraform files
+
+## Additional Files (For Future Use)
+
+These files are ready for when you want to set up CodeBuild integration:
+
+- `buildspec.yml`: CodeBuild build specification with parameterized actions
+- `setup-s3-backend.sh`: Script to configure S3 backend  
+- `create-codebuild.sh`: Script to create CodeBuild project
+- `trigger-build.sh`: Script to trigger builds with different actions
+- `terraform.tfvars.example`: Example variables file
+
+## Next Steps
+
+Once the IAM roles are successfully deployed:
+
+1. The role ARNs can be used to create CodeBuild projects
+2. The role ARNs can be used to create CodePipeline pipelines  
+3. Consider setting up S3 backend for shared state if working in a team
+4. Consider setting up CodeBuild integration for automated deployments
 
 ## Usage
 
@@ -212,6 +322,10 @@ aws sts get-caller-identity
 #     "Account": "123456789012",
 #     "Arn": "arn:aws:iam::123456789012:user/YourUsername"
 # }
+
+# Check if you have all required permissions
+chmod +x check-permissions.sh
+./check-permissions.sh
 ```
 
 #### 4. **Install Terraform Locally (Optional)**
@@ -373,8 +487,46 @@ aws configure
 #### 2. **Permission Denied Errors**
 
 ```bash
-# Error: "User: arn:aws:iam::123456789012:user/username is not authorized to perform: iam:CreateRole"
-# Solution: Ensure your AWS user has the required IAM permissions (see Security Considerations section)
+# Error: "User: arn:aws:iam::730335317277:user/mvdevtfuser is not authorized to perform: iam:CreatePolicy"
+# This means your AWS user lacks IAM permissions to create policies and roles
+```
+
+**Solution Options:**
+
+**Option A: Add AWS Managed Policy (Recommended)**
+
+1. Go to AWS Console → IAM → Users → Find your user (`mvdevtfuser`)
+2. Click "Add permissions" → "Attach policies directly"
+3. Search and attach one of these policies:
+   - `PowerUserAccess` (recommended - allows most actions except user management)
+   - `IAMFullAccess` (for IAM operations only)
+   - `AdministratorAccess` (full access - use with caution)
+
+**Option B: Create Custom Policy**
+
+1. Go to AWS Console → IAM → Policies → Create Policy
+2. Use JSON and paste the policy from the "Security Considerations" section above
+3. Attach the policy to your user
+
+**Option C: Use AWS CLI (if you have admin access elsewhere)**
+
+```bash
+# Attach PowerUserAccess policy
+aws iam attach-user-policy \
+  --user-name mvdevtfuser \
+  --policy-arn arn:aws:iam::aws:policy/PowerUserAccess
+
+# Attach IAMFullAccess policy
+aws iam attach-user-policy \
+  --user-name mvdevtfuser \
+  --policy-arn arn:aws:iam::aws:policy/IAMFullAccess
+```
+
+**Verify permissions after adding:**
+
+```bash
+# Test if you can now create IAM resources
+aws iam list-policies --max-items 1
 ```
 
 #### 3. **S3 Bucket Already Exists**
