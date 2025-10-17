@@ -13,16 +13,19 @@ This Terraform configuration creates AWS IAM roles and policies for CodeBuild an
 ## Resources Created
 
 ### IAM Roles
+
 - **CodeBuild Role**: `${project_name}-${environment}-codebuild-role`
 - **CodePipeline Role**: `${project_name}-${environment}-codepipeline-role`
 
 ### IAM Policies
+
 - **CodeBuild Policies**: Base policy, EC2/VPC, Secrets Manager, Lambda, ACM, ECR, EventBridge, S3, IAM permissions
 - **CodePipeline Policies**: Base policy, CodeCommit, GitHub, SNS notifications
 
 ## Prerequisites
 
 ### 1. **AWS CLI Configured**
+
 ```bash
 # Install AWS CLI (if not already installed)
 # macOS: brew install awscli
@@ -33,12 +36,15 @@ aws configure
 ```
 
 ### 2. **Required AWS Permissions**
+
 Your AWS user needs IAM permissions to create roles and policies. The easiest solution:
 
 **Go to AWS Console → IAM → Users → Find your user → Add permissions → Attach policies:**
+
 - Attach **`PowerUserAccess`** policy (recommended)
 
 **Or have an admin run:**
+
 ```bash
 aws iam attach-user-policy \
   --user-name YOUR_USERNAME \
@@ -46,6 +52,7 @@ aws iam attach-user-policy \
 ```
 
 ### 3. **Verify Setup**
+
 ```bash
 # Test your credentials and permissions
 aws sts get-caller-identity
@@ -60,16 +67,19 @@ chmod +x check-permissions.sh
 ### Deploy the IAM Roles
 
 1. **Initialize Terraform:**
+
 ```bash
 terraform init
 ```
 
 2. **Review what will be created:**
+
 ```bash
 terraform plan
 ```
 
 3. **Deploy the resources:**
+
 ```bash
 terraform apply
 ```
@@ -84,7 +94,7 @@ You can customize the deployment by creating a `terraform.tfvars` file:
 
 ```hcl
 aws_region   = "us-east-1"
-project_name = "terraform-cicd" 
+project_name = "terraform-cicd"
 environment  = "dev"
 
 tags = {
@@ -96,6 +106,7 @@ tags = {
 ```
 
 ### Default Values
+
 - `aws_region`: us-east-1
 - `project_name`: terraform-cicd
 - `environment`: dev
@@ -103,14 +114,16 @@ tags = {
 ## Outputs
 
 After successful deployment, you'll get:
+
 - `codebuild_role_arn`: ARN of the CodeBuild role
-- `codebuild_role_name`: Name of the CodeBuild role  
+- `codebuild_role_name`: Name of the CodeBuild role
 - `codepipeline_role_arn`: ARN of the CodePipeline role
 - `codepipeline_role_name`: Name of the CodePipeline role
 
 ## Troubleshooting
 
 ### Permission Denied Errors
+
 ```bash
 # Error: "User is not authorized to perform: iam:CreateRole"
 ```
@@ -118,6 +131,7 @@ After successful deployment, you'll get:
 **Solution:** Add IAM permissions to your AWS user (see Prerequisites section above)
 
 ### Common Issues
+
 - **AWS CLI not configured**: Run `aws configure`
 - **Wrong region**: Make sure your CLI region matches your desired deployment region
 - **Terraform not found**: Install Terraform locally if needed
@@ -125,6 +139,7 @@ After successful deployment, you'll get:
 ## Advanced Configuration
 
 ### S3 Backend (Optional)
+
 For team collaboration, you can configure S3 backend for shared state:
 
 ```bash
@@ -134,22 +149,13 @@ chmod +x setup-s3-backend.sh
 ```
 
 ### CodeBuild Integration (Optional)
-Files are included for CodeBuild integration when you're ready:
 
-```bash
-# Create CodeBuild project
-chmod +x create-codebuild.sh
-./create-codebuild.sh https://github.com/YOUR_USERNAME/YOUR_REPO terraform-build
-
-# Trigger builds with different actions
-chmod +x trigger-build.sh
-./trigger-build.sh terraform-build apply
-./trigger-build.sh terraform-build destroy
-```
+Additional CodeBuild integration files are available for when you're ready to set up automated builds.
 
 ## Files Description
 
 ### Core Terraform Files
+
 - `main.tf`: Main configuration and provider setup
 - `variables.tf`: Input variables with defaults
 - `iam_roles.tf`: IAM role definitions
@@ -159,14 +165,13 @@ chmod +x trigger-build.sh
 - `outputs.tf`: Output values
 
 ### Configuration Files
+
 - `terraform.tfvars.example`: Example variables file
 - `.gitignore`: Git ignore file for Terraform files
 
 ### Optional Integration Files
-- `buildspec.yml`: CodeBuild build specification with parameterized actions
-- `setup-s3-backend.sh`: Script to configure S3 backend  
-- `create-codebuild.sh`: Script to create CodeBuild project
-- `trigger-build.sh`: Script to trigger builds with different actions
+
+- `setup-s3-backend.sh`: Script to configure S3 backend
 - `check-permissions.sh`: Script to verify AWS permissions
 
 ## Security Considerations
@@ -184,6 +189,6 @@ chmod +x trigger-build.sh
 Once the IAM roles are successfully deployed:
 
 1. Use the role ARNs to create CodeBuild projects
-2. Use the role ARNs to create CodePipeline pipelines  
+2. Use the role ARNs to create CodePipeline pipelines
 3. Consider setting up S3 backend for shared state if working in a team
 4. Consider setting up CodeBuild integration for automated deployments
