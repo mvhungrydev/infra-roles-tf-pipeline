@@ -27,6 +27,13 @@ resource "aws_iam_policy" "codebuild_base_policy" {
           "codebuild:BatchPutCodeCoverages"
         ]
         Resource = "arn:aws:codebuild:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:report-group/${var.project_name}-*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "codebuild:*"
+        ]
+        Resource = "arn:aws:codebuild:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:project/${var.project_name}-*"
       }
     ]
   })
