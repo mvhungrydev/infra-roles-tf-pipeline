@@ -11,12 +11,9 @@ resource "aws_iam_policy" "codebuild_base_policy" {
       {
         Effect = "Allow"
         Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogGroups"
+          "logs:*",
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${var.project_name}-*"
+        Resource = "*"
       },
       {
         Effect = "Allow"
