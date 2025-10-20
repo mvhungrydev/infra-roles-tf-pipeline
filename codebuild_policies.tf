@@ -251,7 +251,10 @@ resource "aws_iam_policy" "codebuild_iam_policy" {
           "iam:TagPolicy",
           "iam:UntagPolicy",
           "iam:ListAttachedRolePolicies",
-          "iam:ListRolePolicies"
+          "iam:ListRolePolicies",
+          "iam:GetRolePolicy",
+          "iam:ListInstanceProfilesForRole",
+          "iam:GetInstanceProfile"
         ]
         Resource = "*"
       }
