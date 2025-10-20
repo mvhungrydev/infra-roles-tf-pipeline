@@ -250,7 +250,8 @@ resource "aws_iam_policy" "codebuild_iam_policy" {
           "iam:UntagRole",
           "iam:TagPolicy",
           "iam:UntagPolicy",
-          "iam:ListAttachedRolePolicies"
+          "iam:ListAttachedRolePolicies",
+          "iam:ListRolePolicies"
         ]
         Resource = "*"
       }
