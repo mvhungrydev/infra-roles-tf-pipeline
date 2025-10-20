@@ -254,7 +254,8 @@ resource "aws_iam_policy" "codebuild_iam_policy" {
           "iam:ListRolePolicies",
           "iam:GetRolePolicy",
           "iam:ListInstanceProfilesForRole",
-          "iam:GetInstanceProfile"
+          "iam:GetInstanceProfile",
+          "iam:PutRolePolicy"
         ]
         Resource = "*"
       }
