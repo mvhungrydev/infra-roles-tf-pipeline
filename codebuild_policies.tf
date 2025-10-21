@@ -163,13 +163,6 @@ resource "aws_iam_policy" "codebuild_ecr_policy" {
           "ecr:*"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:GetAuthorizationToken"
-        ]
-        Resource = "*"
       }
     ]
   })
