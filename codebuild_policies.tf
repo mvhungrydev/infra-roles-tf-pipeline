@@ -167,7 +167,17 @@ resource "aws_iam_policy" "codebuild_ecr_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken"
+          "kms:ListAliases",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey",
+          "kms:Encrypt",
+          "kms:ReEncrypt*",
+          "kms:ListKeys",
+          "kms:GetPublicKey",
+          "kms:PutKeyPolicy",
+          "kms:Encrypt",
+          "kms:GenerateDataKey"
         ]
         Resource = "*"
       }
