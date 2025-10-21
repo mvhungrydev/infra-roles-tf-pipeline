@@ -160,13 +160,7 @@ resource "aws_iam_policy" "codebuild_ecr_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ecr:*"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
+          "ecr:*",
           "kms:ListAliases",
           "kms:Decrypt",
           "kms:DescribeKey",
@@ -274,3 +268,4 @@ resource "aws_iam_policy" "codebuild_iam_policy" {
 
   tags = var.tags
 }
+
