@@ -5,9 +5,6 @@ aws_region   = "us-east-1"
 project_name = "terraform-cicd"
 environment  = "dev"
 
-# S3 Backend Configuration (optional - used by setup script)
-terraform_state_bucket = "tf-pipeline-state"
-terraform_state_key    = "iam-roles/terraform.tfstate"
 
 tags = {
   ManagedBy   = "Terraform"

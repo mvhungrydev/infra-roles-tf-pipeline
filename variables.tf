@@ -26,15 +26,3 @@ variable "tags" {
   }
 }
 
-# S3 Backend Configuration Variables
-variable "terraform_state_bucket" {
-  description = "S3 bucket name for Terraform state storage"
-  type        = string
-  default     = ""
-}
-
-variable "terraform_state_key" {
-  description = "S3 key path for Terraform state file"
-  type        = string
-  default     = "iam-roles/terraform.tfstate"
-}
